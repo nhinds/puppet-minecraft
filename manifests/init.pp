@@ -26,7 +26,7 @@ class minecraft(
       ensure => 'present',
       shell  => $user_shell,
       home   => $user_home,
-      manage_home => $manage_home,
+      managehome => $manage_home,
     }
   }
 
