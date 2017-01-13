@@ -37,6 +37,6 @@ define minecraft::plugin(
     owner   => $user,
     group   => $group,
     mode    => '0644',
-    require => Archive[$plugin_name],
+    require => Archive[$title],
   }
 }
