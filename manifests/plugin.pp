@@ -1,7 +1,10 @@
 define minecraft::plugin(
   $source,
+  $install_dir,
   $plugin_name  = $title,
-  $ensure       = present
+  $ensure       = present,
+  $user,
+  $group,
 ) {
 
   if $plugin_name =~ /^.*\.jar$/ {
@@ -11,10 +14,8 @@ define minecraft::plugin(
   archive { $plugin_name:
     ensure  => $ensure,
     source  => $source,
-    path    => "${::minecraft::install_dir}/plugins/${plugin_name}.jar",
-    notify  => Service['minecraft'],
-    require => File["${::minecraft::install_dir}/plugins"],
-    user    => $::minecraft::user,
+    path    => "${install_dir}/plugins/${plugin_name}.jar",
+    user    => $user,
   }
 
   if $ensure == present {
@@ -23,10 +24,10 @@ define minecraft::plugin(
     $jar_ensure = $ensure
   }
 
-  file { "${::minecraft::install_dir}/plugins/${plugin_name}.jar":
+  file { "${install_dir}/plugins/${plugin_name}.jar":
     ensure  => $jar_ensure,
-    owner   => $::minecraft::user,
-    group   => $::minecraft::group,
+    owner   => $user,
+    group   => $group,
     mode    => '0644',
     require => Archive[$plugin_name],
   }

@@ -1,0 +1,9 @@
+# Managed by Puppet
+<%= @instance %>_enable="<%= @service_enable ? 'YES' : 'NO' %>"
+<%= @instance %>_chdir="<%= @install_dir %>"
+<%= @instance %>_jar="<%= @install_dir %>/<%= @jar %>"
+<%= @instance %>_args="<%= @java_args %>"
+<%= @instance %>_xmx="<%= @xmx %>"
+<%= @instance %>_xms="<%= @xms %>"
+<%= @instance %>_user="<%= @user %>"
+#: ${<%= @instance %>_args="-XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:ParallelGCThreads=4 -XX:+AggressiveOpts"}
