@@ -5,6 +5,10 @@ define minecraft::plugin(
   $ensure       = present,
   $user,
   $group,
+  $checksum        = undef,
+  $checksum_type   = undef,
+  $checksum_url    = undef,
+  $checksum_verify = undef,
 ) {
 
   if $plugin_name =~ /^.*\.jar$/ {
@@ -12,10 +16,14 @@ define minecraft::plugin(
   }
 
   archive { $plugin_name:
-    ensure  => $ensure,
-    source  => $source,
-    path    => "${install_dir}/plugins/${plugin_name}.jar",
-    user    => $user,
+    ensure          => $ensure,
+    source          => $source,
+    path            => "${install_dir}/plugins/${plugin_name}.jar",
+    user            => $user,
+    checksum        => $checksum,
+    checksum_type   => $checksum_type,
+    checksum_url    => $checksum_url,
+    checksum_verify => $checksum_verify,
   }
 
   if $ensure == present {
