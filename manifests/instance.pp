@@ -21,42 +21,6 @@ define minecraft::instance (
   String                     $jar                  = 'minecraft_server.jar',
   Hash                       $server_properties    = {},
   Optional[String]           $java_command         = 'java',
-
-  # The following are server.properties attributes, see
-  # http://minecraft.gamepedia.com/Server.properties for information
-  # Empty strings are represented as empty in templates, unlike undef
-  $generator_settings   = '',
-  $op_permisison_level  = 4,
-  $allow_nether         = true,
-  $level_name           = 'world',
-  $enable_query         = false,
-  $allow_flight         = false,
-  $announce_achievments = true,
-  $server_port          = 25565,
-  $level_type           = 'DEFAULT',
-  $enable_rcon          = false,
-  $force_gamemode       = false,
-  $level_seed           = '',
-  $server_ip            = '',
-  $max_build_height     = 256,
-  $spawn_npcs           = true,
-  $white_list           = false,
-  $spawn_animals        = true,
-  $snooper_enabled      = true,
-  $hardcore             = false,
-  $online_mode          = true,
-  $resource_pack        = '',
-  $pvp                  = true,
-  $difficulty           = 1,
-  $enable_command_block = false,
-  $gamemode             = 0,
-  $player_idle_timeout  = 0,
-  $max_players          = 20,
-  $spawn_monsters       = true,
-  $gen_structures       = true,
-  $view_distance        = 10,
-  $spawn_protection     = 16,
-  $motd                 = 'A Minecraft Server',
 ) {
 
   # Ensures deletion of install_dir does not break module, setup for plugins
@@ -78,20 +42,24 @@ define minecraft::instance (
     require     => File[$dirs],
   }
 
-  [ 'ops.txt',
-    'banned-players.txt',
-    'banned-ips.txt',
-    'white-list.txt',
-  ].each |$cfg_file| {
-    file { "${install_dir}/${cfg_file}":
-      ensure => 'file',
-      content => template("minecraft/${cfg_file}.erb"),
-      owner   => $user,
-      group   => $group,
-      mode    => '0660',
-      require => Minecraft::Source[$title],
-    }
-  }
+  # These are JSON now.  If the .txt is present, Minecraft will convert it
+  # upon startup and rename the .txt file to .txt.converted
+  # Need to figure out how to best manage these.  Usernames in these files
+  # now require a UUID as well.
+  #[ 'ops.txt',
+  #  'banned-players.txt',
+  #  'banned-ips.txt',
+  #  'white-list.txt',
+  #].each |$cfg_file| {
+  #  file { "${install_dir}/${cfg_file}":
+  #    ensure => 'file',
+  #    content => template("minecraft/${cfg_file}.erb"),
+  #    owner   => $user,
+  #    group   => $group,
+  #    mode    => '0660',
+  #    require => Minecraft::Source[$title],
+  #  }
+  #}
 
   file { "${install_dir}/server.properties":
     ensure  => 'file',
