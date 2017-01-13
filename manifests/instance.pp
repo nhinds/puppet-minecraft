@@ -101,7 +101,7 @@ define minecraft::instance (
   }
 
   $server_properties.each |$_property, $_value| {
-    augeas { "minecraft-${title}-${server_property}":
+    augeas { "minecraft-${title}-${_property}":
       lens    => 'Properties.lns',
       incl    => "${install_dir}/server.properties",
       changes => [ "set \"${_property}\" \"${_value}\"" ],
