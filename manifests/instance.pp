@@ -107,5 +107,6 @@ define minecraft::instance (
     default => $plugin_defaults,
   }
 
-  create_resources('minecraft::plugin', $plugins, $_plugin_defaults)
+  $_plugins = prefix($plugins, "${title}__")
+  create_resources('minecraft::plugin', $_plugins, $_plugin_defaults)
 }
