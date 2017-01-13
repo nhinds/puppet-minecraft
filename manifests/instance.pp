@@ -13,7 +13,7 @@ define minecraft::instance (
   Optional[Array[String]]    $banned_players       = undef,
   Optional[Array[String]]    $banned_ips           = undef,
   Optional[Array[String]]    $white_list_players   = undef,
-  Numeric                    $mode                 = '0750',
+  Pattern[/^\d{3,4}$/]       $mode                 = '0750',
   Stdlib::Absolutepath       $init_path            = $minecraft::init_path,
   String                     $init_template        = $minecraft::init_template,
   Optional[Hash]             $plugins_defaults     = undef,
