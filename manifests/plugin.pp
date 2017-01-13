@@ -15,7 +15,7 @@ define minecraft::plugin(
     fail("minecraft plugin title ${plugin_name} must not end in '.jar'")
   }
 
-  archive { $plugin_name:
+  archive { $title:
     ensure          => $ensure,
     source          => $source,
     path            => "${install_dir}/plugins/${plugin_name}.jar",
