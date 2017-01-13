@@ -77,8 +77,7 @@ define minecraft::instance (
     require     => File[$dirs],
   }
 
-  [ 'server.properties',
-    'ops.txt',
+  [ 'ops.txt',
     'banned-players.txt',
     'banned-ips.txt',
     'white-list.txt',
@@ -90,6 +89,23 @@ define minecraft::instance (
       group   => $group,
       mode    => '0660',
       require => Minecraft::Source[$title],
+    }
+  }
+
+  file { "${install_dir}/server.properties":
+    ensure  => 'file',
+    owner   => $user,
+    group   => $group,
+    mode    => '0660',
+    require => Minecraft::Source[$title],
+  }
+
+  $server_properties.each |$_property, $_value| {
+    augeas { "minecraft-${title}-${server_property}":
+      lens    => 'Properties.lns',
+      incl    => "${install_dir}/server.properties",
+      changes => [ "set \"${_property}\" \"${_value}\"" ],
+      notify  => Minecraft::Service[$title],
     }
   }
 
