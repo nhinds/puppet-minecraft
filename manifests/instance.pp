@@ -20,6 +20,7 @@ define minecraft::instance (
   String                     $java_args            = '',
   String                     $jar                  = 'minecraft_server.jar',
   Hash                       $server_properties    = {},
+  Optional[String]           $java_command         = 'java',
 
   # The following are server.properties attributes, see
   # http://minecraft.gamepedia.com/Server.properties for information
@@ -119,8 +120,10 @@ define minecraft::instance (
     xmx            => $xmx,
     xms            => $xms,
     user           => $user,
+    group          => $group,
     java_args      => $java_args,
     jar            => $jar,
+    java_command   => $java_command,
     subscribe      => Minecraft::Source[$title],
   }
 

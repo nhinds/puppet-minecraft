@@ -15,6 +15,7 @@
 # minecraft_<%= @instance %>_xmx="<%= @xmx %>"
 # minecraft_<%= @instance %>_xms="<%= @xms %>"
 # minecraft_<%= @instance %>_user="<%= @user %>"
+# minecraft_<%= @instance %>_java_command="<%= @java_command %>"
 
 # See <%= @install_dir %>/<%= @jar %> for flags
 
@@ -42,6 +43,7 @@ kill_cmd="minecraft_kill"
 : ${minecraft_<%= @instance %>_args=""}
 : ${minecraft_<%= @instance %>_xmx="<%= @xmx %>"}
 : ${minecraft_<%= @instance %>_xms="<%= @xms %>"}
+: ${minecraft_<%= @instance %>_java_command="<%= @java_command %>"}
 
 minecraft_start() {
   unset "${rc_arg}_cmd"
@@ -51,7 +53,7 @@ minecraft_start() {
     echo "ERROR: ${name}_xms is set greater than ${name}_xmx."
   else
     cd $minecraft_<%= @instance %>_chdir
-    su -m $minecraft_<%= @instance %>_user -c "/usr/bin/env tmux -L ${name} new-session -s ${name} -d '/usr/local/bin/java -Xmx${minecraft_<%= @instance %>_xmx} -Xms${minecraft_<%= @instance %>_xms} ${minecraft_<%= @instance %>_args} -jar ${minecraft_<%= @instance %>_jar} nogui'"
+    su -m $minecraft_<%= @instance %>_user -c "/usr/bin/env tmux -L ${name} new-session -s ${name} -d '<%= @java_command %> -Xmx${minecraft_<%= @instance %>_xmx} -Xms${minecraft_<%= @instance %>_xms} ${minecraft_<%= @instance %>_args} -jar ${minecraft_<%= @instance %>_jar} nogui'"
   fi
 }
 
@@ -106,7 +108,7 @@ minecraft_kill() {
   if ! minecraft_running; then
     echo "${name} is not running."
   else
-    #pkill -KILL -u mcserver java
+    pkill -KILL -u ${minecraft_<%= @instance %>_user} -f -- "-jar ${minecraft_<%= @instance %>_jar}"
     echo "${name} has been killed."
   fi
 }

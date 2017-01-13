@@ -8,12 +8,24 @@ define minecraft::service (
   $xmx,
   $xms,
   $user,
+  $group,
   $java_args,
   $jar,
+  $java_command,
 ) {
 
+  # Though not really used, manage the start.sh for good measure
+  file { "minecraft_${title}_start.sh":
+    ensure  => 'file',
+    path    => "${install_dir}/start.sh",
+    mode    => '0750',
+    owner   => $user,
+    group   => $group,
+    content => template('minecraft/start.sh.erb'),
+  }
+
   file { "minecraft_${title}_init":
-    ensure  => 'present',
+    ensure  => 'file',
     path    => "${init_path}/minecraft_${title}",
     owner   => 'root',
     group   => '0',
@@ -24,7 +36,7 @@ define minecraft::service (
 
   if $::osfamily == 'FreeBSD' {
     file { "/etc/rc.conf.d/minecraft_${title}":
-      ensure  => 'present',
+      ensure  => 'file',
       owner   => 'root',
       group   => '0',
       mode    => '0644',
