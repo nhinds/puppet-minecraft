@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# PROVIDE: <%= @instance %>
+# PROVIDE: minecraft_<%= @instance %>
 # REQUIRE: LOGIN DAEMON NETWORKING mountcritlocal
 # KEYWORD: shutdown
 #
@@ -8,24 +8,24 @@
 #
 # Add the following lines to /etc/rc.conf.local to enable the minecraft server:
 #
-#<%= @instance %>_enable="YES"
-#<%= @instance %>_chdir="<%= @install_dir %>"
-#<%= @instance %>_jar="<%= @install_dir %>/<%= @jar %>"
-#<%= @instance %>_args="<%= @java_args %>"
-#<%= @instance %>_xmx="<%= @xmx %>"
-#<%= @instance %>_xms="<%= @xms %>"
-#<%= @instance %>_user="<%= @user %>"
+# minecraft_<%= @instance %>_enable="YES"
+# minecraft_<%= @instance %>_chdir="<%= @install_dir %>"
+# minecraft_<%= @instance %>_jar="<%= @install_dir %>/<%= @jar %>"
+# minecraft_<%= @instance %>_args="<%= @java_args %>"
+# minecraft_<%= @instance %>_xmx="<%= @xmx %>"
+# minecraft_<%= @instance %>_xms="<%= @xms %>"
+# minecraft_<%= @instance %>_user="<%= @user %>"
 
 # See <%= @install_dir %>/<%= @jar %> for flags
 
 . /etc/rc.subr
 
-name=<%= @instance %>
-rcvar=<%= @instance %>_enable
+name=minecraft_<%= @instance %>
+rcvar=${name}_enable
 
 load_rc_config ${name}
 
-pidfile=/var/run/<%= @instance %>.pid
+pidfile=/var/run/${name}.pid
 
 extra_commands="console status kill"
 start_cmd="minecraft_start"
@@ -34,34 +34,34 @@ console_cmd="minecraft_console"
 status_cmd="minecraft_status"
 kill_cmd="minecraft_kill"
 
-: ${<%= @instance %>_enable="NO"}
-: ${<%= @instance %>_session="<%= @instance %>"}
-: ${<%= @instance %>_user="<%= @user %>"}
-: ${<%= @instance %>_chdir="<%= @install_dir %>"}
-: ${<%= @instance %>_jar="<%= @install_dir %>/<%= @jar %>"}
-: ${<%= @instance %>_args="-XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:ParallelGCThreads=4 -XX:+AggressiveOpts"}
-: ${<%= @instance %>_xmx="<%= @xmx %>"}
-: ${<%= @instance %>_xms="<%= @xms %>"}
+: minecraft_${<%= @instance %>_enable="NO"}
+: minecraft_${<%= @instance %>_session="minecraft_<%= @instance %>"}
+: minecraft_${<%= @instance %>_user="<%= @user %>"}
+: minecraft_${<%= @instance %>_chdir="<%= @install_dir %>"}
+: minecraft_${<%= @instance %>_jar="<%= @install_dir %>/<%= @jar %>"}
+: minecraft_${<%= @instance %>_args="-XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:ParallelGCThreads=4 -XX:+AggressiveOpts"}
+: minecraft_${<%= @instance %>_xmx="<%= @xmx %>"}
+: minecraft_${<%= @instance %>_xms="<%= @xms %>"}
 
 minecraft_start() {
   unset "${rc_arg}_cmd"
   if minecraft_running; then
     echo "minecraft already running?"
-  elif [ ${<%= @instance %>_xms%?} -gt ${<%= @instance %>_xmx%?} ]; then
+  elif [ ${minecraft_<%= @instance %>_xms%?} -gt ${minecraft_<%= @instance %>_xmx%?} ]; then
     echo "ERROR: ${name}_xms is set greater than ${name}_xmx."
   else
-    cd $<%= @instance %>_chdir
-    su -m $<%= @instance %>_user -c "/usr/bin/env tmux -L ${name} new-session -s ${name} -d '/usr/local/bin/java -Xmx${<%= @instance %>_xmx} -Xms${<%= @instance %>_xms} ${<%= @instance %>_args} -jar ${<%= @instance %>_jar} nogui'"
+    cd $minecraft_<%= @instance %>_chdir
+    su -m $minecraft_<%= @instance %>_user -c "/usr/bin/env tmux -L ${name} new-session -s ${name} -d '/usr/local/bin/java -Xmx${minecraft_<%= @instance %>_xmx} -Xms${minecraft_<%= @instance %>_xms} ${minecraft_<%= @instance %>_args} -jar ${minecraft_<%= @instance %>_jar} nogui'"
   fi
 }
 
 minecraft_stop() {
   if minecraft_running; then
     echo "Stopping minecraft."
-    su -m ${<%= @instance %>_user} -c "/usr/bin/env tmux -L ${name} send-keys -t ${name} \"say SERVER SHUTTING DOWN IN 10 SECONDS. Saving map...\" ENTER"
-    su -m ${<%= @instance %>_user} -c "/usr/bin/env tmux -L ${name} send-keys -t ${name} \"save-all\" ENTER"
+    su -m ${minecraft_<%= @instance %>_user} -c "/usr/bin/env tmux -L ${name} send-keys -t ${name} \"say SERVER SHUTTING DOWN IN 10 SECONDS. Saving map...\" ENTER"
+    su -m ${minecraft_<%= @instance %>_user} -c "/usr/bin/env tmux -L ${name} send-keys -t ${name} \"save-all\" ENTER"
     sleep 10
-    su -m ${<%= @instance %>_user} -c "/usr/bin/env tmux -L ${name} send-keys -t ${name} \"stop\" ENTER"
+    su -m ${minecraft_<%= @instance %>_user} -c "/usr/bin/env tmux -L ${name} send-keys -t ${name} \"stop\" ENTER"
     i=0
     while [ $i -lt 10 ]; do
       i=$(($i + 1))
@@ -89,7 +89,7 @@ minecraft_status() {
 }
 
 minecraft_running() {
-  pgrep -qu ${<%= @instance %>_user} java
+  pgrep -qu ${minecraft_<%= @instance %>_user} java
   return $?
 }
 
@@ -98,7 +98,7 @@ minecraft_console() {
     echo "${name} is not running."
   else
     export TERM=xterm
-    su -m ${<%= @instance %>_user} -c "/usr/bin/env tmux -L ${name} attach-session -t ${name}"
+    su -m ${minecraft_<%= @instance %>_user} -c "/usr/bin/env tmux -L ${name} attach-session -t ${name}"
   fi
 }
 

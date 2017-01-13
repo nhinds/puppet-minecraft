@@ -12,30 +12,30 @@ define minecraft::service (
   $jar,
 ) {
 
-  file { "${title}_init":
+  file { "minecraft_${title}_init":
     ensure  => 'present',
-    path    => "${init_path}/${title}",
+    path    => "${init_path}/minecraft_${title}",
     owner   => 'root',
-    group   => 'root',
+    group   => '0',
     mode    => '0744',
     content => template($init_template),
-    notify  => Service[$title],
+    notify  => Service["minecraft_${title}"],
   }
 
   if $::osfamily == 'FreeBSD' {
-    file { "/etc/rc.conf.d/${title}":
+    file { "/etc/rc.conf.d/minecraft_${title}":
       ensure  => 'present',
       owner   => 'root',
-      group   => 'wheel',
+      group   => '0',
       mode    => '0644',
       content => template('minecraft/minecraft_rc.erb'),
-      notify  => Service[$title],
+      notify  => Service["minecraft_${title}"],
     }
   }
 
-  service { $title:
+  service { "minecraft_${title}":
     ensure    => $service_ensure,
     enable    => $service_enable,
-    subscribe => File["${title}_init" ],
+    subscribe => File["minecraft_${title}_init" ],
   }
 }
