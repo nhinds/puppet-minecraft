@@ -9,6 +9,7 @@ define minecraft::service (
   $xms,
   $user,
   $java_args,
+  $jar,
 ) {
 
   file { "${title}_init":

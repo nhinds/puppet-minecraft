@@ -18,6 +18,7 @@ define minecraft::instance (
   String                     $init_template        = $minecraft::init_template,
   Optional[Hash]             $plugins_defaults     = {},
   String                     $java_args            = '',
+  String                     $jar                  = 'minecraft_server.jar',
 
   # The following are server.properties attributes, see
   # http://minecraft.gamepedia.com/Server.properties for information
@@ -71,6 +72,7 @@ define minecraft::instance (
     install_dir => $install_dir,
     user        => $user,
     group       => $group,
+    jar         => $jar,
     require     => File[$dirs],
   }
 
@@ -101,6 +103,7 @@ define minecraft::instance (
     xms            => $xms,
     user           => $user,
     java_args      => $java_args,
+    jar            => $jar,
     subscribe      => Minecraft::Source[$title],
   }
 

@@ -6,8 +6,6 @@ define minecraft::source (
   $jar,
 ) {
 
-  $jar_name = 'minecraft_server'
-
   case $source {
     /^(\d+)\.(\d+)\.(\d+)$/,    # Matches Semantic Versioning for vanilla Minecraft, see http://semver.org/
     /^(\d{2})w(\d{2})[a-z]$/: { # Matches current versioning scheme for vanilla Minecraft snapshots, uses the same download source URL
