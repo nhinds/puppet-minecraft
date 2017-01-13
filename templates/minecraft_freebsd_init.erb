@@ -89,7 +89,7 @@ minecraft_status() {
 }
 
 minecraft_running() {
-  pgrep -qu ${minecraft_<%= @instance %>_user} -f -- '-jar ${minecraft_<%= @instance %>_jar}'
+  pgrep -qu ${minecraft_<%= @instance %>_user} -f -- "-jar ${minecraft_<%= @instance %>_jar}"
   return $?
 }
 
