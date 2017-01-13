@@ -1,13 +1,13 @@
 define minecraft::instance (
-  Regexp[/^[\w]+$/]          $instance             = $title,
-  Regexp[/^[\w\.]+$/]        $user                 = $minecraft::user,
-  Regexp[/^[\w\.]+$/]        $group                = $minecraft::group,
+  Pattern[/^[\w]+$/]         $instance             = $title,
+  Pattern[/^[\w\.]+$/]       $user                 = $minecraft::user,
+  Pattern[/^[\w\.]+$/]       $group                = $minecraft::group,
   Stdlib::Absolutepath       $install_dir          = "${minecraft::install_base}/${instance}",
   String                     $source               = '1.7.4',
   Enum['running', 'stopped'] $service_ensure       = 'running',
   Boolean                    $service_enable       = true,
-  Regexp[/^\d+(M|G)?$/]      $xmx                  = '1024M',
-  Regexp[/^\d+(M|G)?$/]      $xms                  = '512M',
+  Pattern[/^\d+(M|G)?$/]     $xmx                  = '1024M',
+  Pattern[/^\d+(M|G)?$/]     $xms                  = '512M',
   Hash                       $plugins              = {},
   Array[String]              $ops                  = undef,
   Array[String]              $banned_players       = undef,
@@ -53,7 +53,7 @@ define minecraft::instance (
   $gen_structures       = true,
   $view_distance        = 10,
   $spawn_protection     = 16,
-  $motd                 = 'A Minecraft Server'
+  $motd                 = 'A Minecraft Server',
 ) {
 
   # Ensures deletion of install_dir does not break module, setup for plugins

@@ -1,7 +1,7 @@
 class minecraft(
   Stdlib::Absolutepath $install_base         = '/opt/minecraft',
-  Regexp[/^[\w]+$/]    $user                 = 'minecraft',      # The user account for the Minecraft service
-  Regexp[/^[\w]+$/]    $group                = 'minecraft',      # The user group for the Minecraft service
+  Pattern[/^[\w]+$/]   $user                 = 'minecraft',      # The user account for the Minecraft service
+  Pattern[/^[\w]+$/]   $group                = 'minecraft',      # The user group for the Minecraft service
   Boolean              $manage_user          = true,
   Boolean              $manage_group         = true,
   String               $user_shell           = '/usr/sbin/nologin',
@@ -13,7 +13,7 @@ class minecraft(
   Optional[Hash]       $instance_defaults    = {},
   Stdlib::Absolutepath $init_path            = $minecraft::params::init_path,
   String               $init_template        = $minecraft::params::init_template,
-) {
+) inherits minecraft::params {
 
   if $manage_group {
     group { $group:
