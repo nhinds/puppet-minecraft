@@ -19,6 +19,7 @@ define minecraft::instance (
   Optional[Hash]             $plugins_defaults     = {},
   String                     $java_args            = '',
   String                     $jar                  = 'minecraft_server.jar',
+  Hash                       $server_properties    = {},
 
   # The following are server.properties attributes, see
   # http://minecraft.gamepedia.com/Server.properties for information
