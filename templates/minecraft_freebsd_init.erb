@@ -34,14 +34,14 @@ console_cmd="minecraft_console"
 status_cmd="minecraft_status"
 kill_cmd="minecraft_kill"
 
-: minecraft_${<%= @instance %>_enable="NO"}
-: minecraft_${<%= @instance %>_session="minecraft_<%= @instance %>"}
-: minecraft_${<%= @instance %>_user="<%= @user %>"}
-: minecraft_${<%= @instance %>_chdir="<%= @install_dir %>"}
-: minecraft_${<%= @instance %>_jar="<%= @install_dir %>/<%= @jar %>"}
-: minecraft_${<%= @instance %>_args="-XX:+UseConcMarkSweepGC -XX:+CMSIncrementalPacing -XX:ParallelGCThreads=4 -XX:+AggressiveOpts"}
-: minecraft_${<%= @instance %>_xmx="<%= @xmx %>"}
-: minecraft_${<%= @instance %>_xms="<%= @xms %>"}
+: ${minecraft_<%= @instance %>_enable="NO"}
+: ${minecraft_<%= @instance %>_session="minecraft_<%= @instance %>"}
+: ${minecraft_<%= @instance %>_user="<%= @user %>"}
+: ${minecraft_<%= @instance %>_chdir="<%= @install_dir %>"}
+: ${minecraft_<%= @instance %>_jar="<%= @install_dir %>/<%= @jar %>"}
+: ${minecraft_<%= @instance %>_args=""}
+: ${minecraft_<%= @instance %>_xmx="<%= @xmx %>"}
+: ${minecraft_<%= @instance %>_xms="<%= @xms %>"}
 
 minecraft_start() {
   unset "${rc_arg}_cmd"
@@ -89,7 +89,7 @@ minecraft_status() {
 }
 
 minecraft_running() {
-  pgrep -qu ${minecraft_<%= @instance %>_user} java
+  pgrep -qu ${minecraft_<%= @instance %>_user} -f -- '-jar ${minecraft_<%= @instance %>_jar}'
   return $?
 }
 
