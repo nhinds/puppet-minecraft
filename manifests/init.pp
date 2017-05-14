@@ -1,59 +1,43 @@
 class minecraft(
-  $user                 = 'minecraft',      # The user account for the Minecraft service
-  $group                = 'minecraft',      # The user group for the Minecraft service
-  $install_dir          = '/opt/minecraft', # Owned by user:group
-  $source               = '1.7.4',          # Minecraft (semvar) or CraftBukkit ('recommended', 'beta', or 'dev'), or direct source (URL for wget)
-  $autostart            = true,             # Start service at boot
-  $manage_java          = true,             # Manage the JRE package
-  $heap_size            = '1024',           # The maximum Java heap size in MB
-  $heap_start           = '256',            # The initial Java heap size in MB
-  $plugins              = {},               # Hash of plugins
-  $ops                  = undef,
-  $banned_players       = undef,
-  $banned_ips           = undef,
-  $white_list_players   = undef,
+  Stdlib::Absolutepath $install_base         = '/opt/minecraft',
+  Pattern[/^[\w]+$/]   $user                 = 'minecraft',      # The user account for the Minecraft service
+  Pattern[/^[\w]+$/]   $group                = 'minecraft',      # The user group for the Minecraft service
+  Boolean              $manage_user          = true,
+  Boolean              $manage_group         = true,
+  String               $user_shell           = '/usr/sbin/nologin',
+  Stdlib::Absolutepath $user_home            = $install_base,
+  Boolean              $manage_home          = false,
+  Boolean              $manage_install_base  = true,
+  String               $mode                 = '0750',
+  Optional[Hash]       $instances            = {},
+  Optional[Hash]       $instance_defaults    = {},
+  Stdlib::Absolutepath $init_path            = $minecraft::params::init_path,
+  String               $init_template        = $minecraft::params::init_template,
+) inherits minecraft::params {
 
-  # The following are server.properties attributes, see
-  # http://minecraft.gamepedia.com/Server.properties for information
-  # Empty strings are represented as empty in templates, unlike undef
-  $generator_settings   = '',
-  $op_permisison_level  = 4,
-  $allow_nether         = true,
-  $level_name           = 'world',
-  $enable_query         = false,
-  $allow_flight         = false,
-  $announce_achievments = true,
-  $server_port          = 25565,
-  $level_type           = 'DEFAULT',
-  $enable_rcon          = false,
-  $force_gamemode       = false,
-  $level_seed           = '',
-  $server_ip            = '',
-  $max_build_height     = 256,
-  $spawn_npcs           = true,
-  $white_list           = false,
-  $spawn_animals        = true,
-  $snooper_enabled      = true,
-  $hardcore             = false,
-  $online_mode          = true,
-  $resource_pack        = '',
-  $pvp                  = true,
-  $difficulty           = 1,
-  $enable_command_block = false,
-  $gamemode             = 0,
-  $player_idle_timeout  = 0,
-  $max_players          = 20,
-  $spawn_monsters       = true,
-  $gen_structures       = true,
-  $view_distance        = 10,
-  $spawn_protection     = 16,
-  $motd                 = 'A Minecraft Server') {
+  if $manage_group {
+    group { $group:
+      ensure => 'present',
+    }
+  }
 
-  include ::minecraft::packages
-  include ::minecraft::properties
-  include ::minecraft::service
-  include ::minecraft::source
-  include ::minecraft::user
+  if $manage_user {
+    user { $user:
+      ensure => 'present',
+      shell  => $user_shell,
+      home   => $user_home,
+      managehome => $manage_home,
+    }
+  }
 
-  create_resources('minecraft::plugin', $plugins)
+  if $manage_install_base {
+    file { $install_base:
+      ensure => 'directory',
+      owner  => $user,
+      group  => $group,
+      mode   => $mode,
+    }
+  }
+
+  create_resources('minecraft::instance', $instances, $instance_defaults)
 }
