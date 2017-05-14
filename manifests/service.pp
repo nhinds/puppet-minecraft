@@ -35,6 +35,16 @@ define minecraft::service (
     }
   }
 
+  # Reload systemd whenever the init script changes on systems using systemd
+  exec { "minecraft_${title}_reload_systemd":
+    command     => 'systemctl daemon-reload',
+    path        => ['/bin', '/usr/bin'],
+    refreshonly => true,
+    onlyif      => 'ps -p 1 -o comm= | grep -q systemd',
+    subscribe   => File["minecraft_${title}_init"],
+    before      => Service["minecraft_${title}"],
+  }
+
   service { "minecraft_${title}":
     ensure    => $service_ensure,
     enable    => $service_enable,
