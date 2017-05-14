@@ -4,7 +4,7 @@ class minecraft(
   $group                = 'minecraft',      # The user group for the Minecraft service
   $manage_user          = true,
   $manage_group         = true,
-  $user_shell           = '/usr/sbin/nologin',
+  $user_shell           = '/bin/sh',
   $user_home            = undef,
   $manage_home          = false,
   $manage_install_base  = true,
