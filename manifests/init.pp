@@ -1,19 +1,23 @@
 class minecraft(
-  Stdlib::Absolutepath $install_base         = '/opt/minecraft',
-  Pattern[/^[\w]+$/]   $user                 = 'minecraft',      # The user account for the Minecraft service
-  Pattern[/^[\w]+$/]   $group                = 'minecraft',      # The user group for the Minecraft service
-  Boolean              $manage_user          = true,
-  Boolean              $manage_group         = true,
-  String               $user_shell           = '/usr/sbin/nologin',
-  Stdlib::Absolutepath $user_home            = $install_base,
-  Boolean              $manage_home          = false,
-  Boolean              $manage_install_base  = true,
-  String               $mode                 = '0750',
-  Optional[Hash]       $instances            = {},
-  Optional[Hash]       $instance_defaults    = {},
-  Stdlib::Absolutepath $init_path            = $minecraft::params::init_path,
-  String               $init_template        = $minecraft::params::init_template,
+  $install_base         = '/opt/minecraft',
+  $user                 = 'minecraft',      # The user account for the Minecraft service
+  $group                = 'minecraft',      # The user group for the Minecraft service
+  $manage_user          = true,
+  $manage_group         = true,
+  $user_shell           = '/usr/sbin/nologin',
+  $user_home            = undef,
+  $manage_home          = false,
+  $manage_install_base  = true,
+  $mode                 = '0750',
+  $instances            = {},
+  $instance_defaults    = {},
+  $init_path            = $minecraft::params::init_path,
+  $init_template        = $minecraft::params::init_template,
 ) inherits minecraft::params {
+  $_user_home = $user_home ? {
+    undef   => $install_base,
+    default => $user_home,
+  }
 
   if $manage_group {
     group { $group:
@@ -25,7 +29,7 @@ class minecraft(
     user { $user:
       ensure => 'present',
       shell  => $user_shell,
-      home   => $user_home,
+      home   => $_user_home,
       managehome => $manage_home,
     }
   }

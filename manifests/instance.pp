@@ -1,30 +1,34 @@
 define minecraft::instance (
-  Pattern[/^[\w]+$/]         $instance             = $title,
-  Pattern[/^[\w\.]+$/]       $user                 = $minecraft::user,
-  Pattern[/^[\w\.]+$/]       $group                = $minecraft::group,
-  Stdlib::Absolutepath       $install_dir          = "${minecraft::install_base}/${instance}",
-  String                     $source               = '1.7.4',
-  Enum['running', 'stopped'] $service_ensure       = 'running',
-  Boolean                    $service_enable       = true,
-  Pattern[/^\d+(M|G)?$/]     $xmx                  = '1024M',
-  Pattern[/^\d+(M|G)?$/]     $xms                  = '512M',
-  Hash                       $plugins              = {},
-  Optional[Array[String]]    $ops                  = [],
-  Optional[Array[String]]    $banned_players       = [],
-  Optional[Array[String]]    $banned_ips           = [],
-  Optional[Array[String]]    $white_list_players   = [],
-  Pattern[/^\d{3,4}$/]       $mode                 = '0750',
-  Stdlib::Absolutepath       $init_path            = $minecraft::init_path,
-  String                     $init_template        = $minecraft::init_template,
-  Optional[Hash]             $plugins_defaults     = {},
-  String                     $java_args            = '',
-  String                     $jar                  = 'minecraft_server.jar',
-  Hash                       $server_properties    = {},
-  Optional[String]           $java_command         = 'java',
+  $instance             = $title,
+  $user                 = $minecraft::user,
+  $group                = $minecraft::group,
+  $install_dir          = undef,
+  $source               = '1.7.4',
+  $service_ensure       = 'running',
+  $service_enable       = true,
+  $xmx                  = '1024M',
+  $xms                  = '512M',
+  $plugins              = {},
+  $ops                  = [],
+  $banned_players       = [],
+  $banned_ips           = [],
+  $white_list_players   = [],
+  $mode                 = '0750',
+  $init_path            = $minecraft::init_path,
+  $init_template        = $minecraft::init_template,
+  $plugins_defaults     = {},
+  $java_args            = '',
+  $jar                  = 'minecraft_server.jar',
+  $server_properties    = {},
+  $java_command         = 'java',
 ) {
+  $_install_dir = $install_dir ? {
+    undef => "${minecraft::install_base}/${instance}",
+    default => $install_dir,
+  }
 
   # Ensures deletion of install_dir does not break module, setup for plugins
-  $dirs = [ $install_dir, "${install_dir}/plugins" ]
+  $dirs = [ $_install_dir, "${_install_dir}/plugins" ]
 
   file { $dirs:
     ensure  => 'directory',
@@ -35,7 +39,7 @@ define minecraft::instance (
 
   minecraft::source { $title:
     source      => $source,
-    install_dir => $install_dir,
+    install_dir => $_install_dir,
     user        => $user,
     group       => $group,
     jar         => $jar,
@@ -51,7 +55,7 @@ define minecraft::instance (
   #  'banned-ips.txt',
   #  'white-list.txt',
   #].each |$cfg_file| {
-  #  file { "${install_dir}/${cfg_file}":
+  #  file { "${_install_dir}/${cfg_file}":
   #    ensure => 'file',
   #    content => template("minecraft/${cfg_file}.erb"),
   #    owner   => $user,
@@ -61,26 +65,33 @@ define minecraft::instance (
   #  }
   #}
 
-  file { "${install_dir}/server.properties":
+  file { "${_install_dir}/server.properties":
     ensure  => 'file',
     owner   => $user,
     group   => $group,
     mode    => '0660',
     require => Minecraft::Source[$title],
   }
-
-  $server_properties.each |$_property, $_value| {
-    augeas { "minecraft-${title}-${_property}":
-      lens    => 'Properties.lns',
-      incl    => "${install_dir}/server.properties",
-      changes => [ "set \"${_property}\" \"${_value}\"" ],
-      notify  => Minecraft::Service[$title],
-    }
+  
+  # Build an array of augeas commands for the $server_properties hash. Each is 'set "<key>" "<value>"'
+  $server_properties_changes = suffix(
+    prefix(
+      join_keys_to_values($server_properties, '" "'),
+      'set "'
+    ),
+    '"'
+  )
+  augeas { "minecraft-${instance}-server-properties":
+    lens    => 'Properties.lns',
+    incl    => "${_install_dir}/server.properties",
+    changes => $server_properties_changes,
+    notify  => Minecraft::Service[$instance],
+    require => File["${_install_dir}/server.properties"],
   }
 
   minecraft::service { $title:
     instance       => $instance,
-    install_dir    => $install_dir,
+    install_dir    => $_install_dir,
     service_ensure => $service_ensure,
     service_enable => $service_enable,
     init_path      => $init_path,
@@ -95,16 +106,17 @@ define minecraft::instance (
     subscribe      => Minecraft::Source[$title],
   }
 
-  $_plugin_defaults = $plugin_defaults ? {
-    undef   => {
-      install_dir => $install_dir,
+  if $plugin_defaults != undef {
+    $_plugin_defaults = $plugin_defaults
+  } else {
+    $_plugin_defaults = {
+      install_dir => $_install_dir,
       user        => $user,
       group       => $group,
       ensure      => $present,
       require     => Minecraft::Source[$title],
       notify      => Minecraft::Service[$title],
-    },
-    default => $plugin_defaults,
+    }
   }
 
   $_plugins = prefix($plugins, "${title}__")
