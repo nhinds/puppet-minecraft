@@ -8,6 +8,7 @@ class minecraft(
   $user_home            = undef,
   $manage_home          = false,
   $manage_install_base  = true,
+  $manage_java          = true,
   $mode                 = '0750',
   $instances            = {},
   $instance_defaults    = {},
@@ -42,6 +43,8 @@ class minecraft(
       mode   => $mode,
     }
   }
+
+  include ::minecraft::packages
 
   create_resources('minecraft::instance', $instances, $instance_defaults)
 }
