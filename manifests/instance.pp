@@ -9,10 +9,10 @@ define minecraft::instance (
   $xmx                  = '1024M',
   $xms                  = '512M',
   $plugins              = {},
-  $ops                  = [],
-  $banned_players       = [],
-  $banned_ips           = [],
-  $white_list_players   = [],
+  $ops                  = undef,
+  $banned_players       = undef,
+  $banned_ips           = undef,
+  $white_list_players   = undef,
   $mode                 = '0750',
   $init_path            = $minecraft::init_path,
   $init_template        = $minecraft::init_template,
@@ -46,24 +46,46 @@ define minecraft::instance (
     require     => File[$dirs],
   }
 
-  # These are JSON now.  If the .txt is present, Minecraft will convert it
-  # upon startup and rename the .txt file to .txt.converted
-  # Need to figure out how to best manage these.  Usernames in these files
-  # now require a UUID as well.
-  #[ 'ops.txt',
-  #  'banned-players.txt',
-  #  'banned-ips.txt',
-  #  'white-list.txt',
-  #].each |$cfg_file| {
-  #  file { "${_install_dir}/${cfg_file}":
-  #    ensure => 'file',
-  #    content => template("minecraft/${cfg_file}.erb"),
-  #    owner   => $user,
-  #    group   => $group,
-  #    mode    => '0660',
-  #    require => Minecraft::Source[$title],
-  #  }
-  #}
+  if $ops != undef {
+    minecraft_setting { "${_install_dir}/ops.json":
+      value          => $ops,
+      id_property    => 'name',
+      add_command    => 'op %s',
+      remove_command => 'deop %s',
+      user           => $user,
+      instance       => $instance,
+    }
+  }
+  if $banned_ips != undef {
+    minecraft_setting { "${_install_dir}/banned-ips.json":
+      value          => $banned_ips,
+      id_property    => 'ip',
+      add_command    => 'ban-ip %s',
+      remove_command => 'pardon-ip %s',
+      user           => $user,
+      instance       => $instance,
+    }
+  }
+  if $banned_players != undef {
+    minecraft_setting { "${_install_dir}/banned-players.json":
+      value          => $banned_players,
+      id_property    => 'name',
+      add_command    => 'ban %s',
+      remove_command => 'pardon %s',
+      user           => $user,
+      instance       => $instance,
+    }
+  }
+  if $white_list_players != undef {
+    minecraft_setting { "${_install_dir}/whitelist.json":
+      value          => $white_list_players,
+      id_property    => 'name',
+      add_command    => 'whitelist add %s',
+      remove_command => 'whitelist remove %s',
+      user           => $user,
+      instance       => $instance,
+    }
+  }
 
   file { "${_install_dir}/server.properties":
     ensure  => 'file',
