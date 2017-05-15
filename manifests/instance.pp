@@ -54,6 +54,7 @@ define minecraft::instance (
       remove_command => 'deop %s',
       user           => $user,
       instance       => $instance,
+      require        => Minecraft::Service[$instance],
     }
   }
   if $banned_ips != undef {
@@ -64,6 +65,7 @@ define minecraft::instance (
       remove_command => 'pardon-ip %s',
       user           => $user,
       instance       => $instance,
+      require        => Minecraft::Service[$instance],
     }
   }
   if $banned_players != undef {
@@ -74,6 +76,7 @@ define minecraft::instance (
       remove_command => 'pardon %s',
       user           => $user,
       instance       => $instance,
+      require        => Minecraft::Service[$instance],
     }
   }
   if $white_list_players != undef {
@@ -84,6 +87,7 @@ define minecraft::instance (
       remove_command => 'whitelist remove %s',
       user           => $user,
       instance       => $instance,
+      require        => Minecraft::Service[$instance],
     }
   }
 
