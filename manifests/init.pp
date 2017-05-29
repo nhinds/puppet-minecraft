@@ -13,6 +13,7 @@ class minecraft(
   $instances            = {},
   $instance_defaults    = {},
   $init_path            = $minecraft::params::init_path,
+  $init_path_suffix     = $minecraft::params::init_path_suffix,
   $init_template        = $minecraft::params::init_template,
 ) inherits minecraft::params {
   $_user_home = $user_home ? {

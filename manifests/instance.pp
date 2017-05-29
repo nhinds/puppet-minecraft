@@ -15,6 +15,7 @@ define minecraft::instance (
   $white_list_players   = undef,
   $mode                 = '0750',
   $init_path            = $minecraft::init_path,
+  $init_path_suffix     = $minecraft::init_path_suffix,
   $init_template        = $minecraft::init_template,
   $plugins_defaults     = {},
   $java_args            = '',
@@ -98,7 +99,7 @@ define minecraft::instance (
     mode    => '0660',
     require => Minecraft::Source[$title],
   }
-  
+
   # Build an array of augeas commands for the $server_properties hash. Each is 'set "<key>" "<value>"'
   $server_properties_changes = suffix(
     prefix(
@@ -116,20 +117,21 @@ define minecraft::instance (
   }
 
   minecraft::service { $title:
-    instance       => $instance,
-    install_dir    => $_install_dir,
-    service_ensure => $service_ensure,
-    service_enable => $service_enable,
-    init_path      => $init_path,
-    init_template  => $init_template,
-    xmx            => $xmx,
-    xms            => $xms,
-    user           => $user,
-    group          => $group,
-    java_args      => $java_args,
-    jar            => $jar,
-    java_command   => $java_command,
-    subscribe      => Minecraft::Source[$title],
+    instance         => $instance,
+    install_dir      => $_install_dir,
+    service_ensure   => $service_ensure,
+    service_enable   => $service_enable,
+    init_path        => $init_path,
+    init_path_suffix => $init_path_suffix,
+    init_template    => $init_template,
+    xmx              => $xmx,
+    xms              => $xms,
+    user             => $user,
+    group            => $group,
+    java_args        => $java_args,
+    jar              => $jar,
+    java_command     => $java_command,
+    subscribe        => Minecraft::Source[$title],
   }
 
   if $plugin_defaults != undef {
