@@ -7,7 +7,7 @@ define minecraft::source (
 ) {
 
   case $source {
-    /^(\d+)\.(\d+)\.(\d+)$/,    # Matches Semantic Versioning for vanilla Minecraft, see http://semver.org/
+    /^(\d+)\.(\d+)(\.(\d+))?$/, # Matches Semantic Versioning for vanilla Minecraft, see http://semver.org/
     /^(\d{2})w(\d{2})[a-z]$/: { # Matches current versioning scheme for vanilla Minecraft snapshots, uses the same download source URL
       $download = "https://s3.amazonaws.com/Minecraft.Download/versions/${source}/minecraft_server.${source}.jar"
     }

@@ -14,6 +14,7 @@ This fork of `puppet-minecraft` (`nhinds/puppet-minecraft`) brings support for:
 * Ubuntu 16.04 with systemd
 * managing ops/whitelist/banned IPs/banned players with the updated JSON format
 * multiple server instances (thanks to a branch of `joshbeard/puppet-minecraft`)
+* Minecraft 1.12
 
 This module has been tested on Ubuntu Server 16.04 with Puppet 3.8.5.
 
