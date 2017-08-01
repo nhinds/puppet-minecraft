@@ -57,6 +57,7 @@ behaves:
 * `banned_ips`: IPs which should be banned
 * `white_list_players`: Players which should be whitelisted. Does nothing unless the `white-list` server property is also set to `true`
 * `server_properties`: Hash of properties to set in Minecraft's `server.properties`
+* `zip_file`: Is the `source` a pointer to a full server zip (Curse style). If true the zip will be unpacked into `install_dir`.
 
 ### Minecraft Versions / CraftBukkit Builds
 
