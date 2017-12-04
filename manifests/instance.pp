@@ -23,6 +23,7 @@ define minecraft::instance (
   $server_properties    = {},
   $java_command         = 'java',
   $zip_file             = false,
+  $ftb_server_version   = undef,
 ) {
   $_install_dir = $install_dir ? {
     undef => "${minecraft::install_base}/${instance}",
@@ -33,20 +34,21 @@ define minecraft::instance (
   $dirs = [ $_install_dir, "${_install_dir}/plugins" ]
 
   file { $dirs:
-    ensure  => 'directory',
-    owner   => $user,
-    group   => $group,
-    mode    => $mode,
+    ensure => 'directory',
+    owner  => $user,
+    group  => $group,
+    mode   => $mode,
   }
 
   minecraft::source { $title:
-    source      => $source,
-    install_dir => $_install_dir,
-    user        => $user,
-    group       => $group,
-    jar         => $jar,
-    require     => File[$dirs],
-    zip_file    => $zip_file,
+    source             => $source,
+    install_dir        => $_install_dir,
+    user               => $user,
+    group              => $group,
+    jar                => $jar,
+    require            => File[$dirs],
+    zip_file           => $zip_file,
+    ftb_server_version => $ftb_server_version,
   }
 
   if $ops != undef {

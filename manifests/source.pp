@@ -5,6 +5,7 @@ define minecraft::source (
   $group,
   $jar,
   $zip_file,
+  $ftb_server_version,
 ) {
 
   case $source {
@@ -56,6 +57,15 @@ define minecraft::source (
     owner   => $user,
     group   => $group,
     content => "eula=true\n",
+    require => Archive["${title}_minecraft_server"],
   }
 
+  if ($ftb_server_version != undef) {
+    exec { 'Run FTB Install':
+      command => "/bin/sh ${install_dir}/FTBInstall.sh",
+      creates => "${install_dir}/minecraft_server.${ftb_server_version}.jar",
+      require => Archive["${title}_minecraft_server"],
+      notify  => Minecraft::Service[$title],
+    }
+  }
 }
