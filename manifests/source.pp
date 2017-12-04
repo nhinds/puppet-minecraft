@@ -56,6 +56,7 @@ define minecraft::source (
     owner   => $user,
     group   => $group,
     content => "eula=true\n",
+    require => Archive["${title}_minecraft_server"],
   }
 
 }
